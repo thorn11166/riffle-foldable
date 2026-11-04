@@ -5,7 +5,7 @@
 -->
 <resources>
     <!-- Navigation drawer -->
-    <string name="ui_drawer_riffle" translatable="false">Riffle</string>
+    <string name="ui_drawer_riffle" translatable="false">Riffle Foldable</string>
     <string name="ui_drawer_no_source">No source</string>
     <string name="ui_drawer_downloads">Downloads</string>
     <string name="ui_drawer_settings">Settings</string>

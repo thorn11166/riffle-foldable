@@ -5,7 +5,7 @@
   Every key here MUST also exist in values-es/ and values-bg/.
 -->
 <resources>
-    <string name="ui_app_name" translatable="false">Riffle</string>
+    <string name="ui_app_name" translatable="false">Riffle Foldable</string>
     <string name="ui_source_storyteller_name" translatable="false">Storyteller</string>
     <string name="ui_adds_the_toggle_to_the_reader_top_bar_all_orientations">Adds the toggle to the reader top bar (all orientations)</string>
     <string name="ui_adds_the_toggle_to_the_reader_top_bar_vertical_and_continuous_only">Adds the toggle to the reader top bar (Vertical &amp; Continuous only)</string>

@@ -104,7 +104,7 @@
     <string name="ui_oreilly_signing_in">Влизане…</string>
     <string name="ui_oreilly_signing_in_sub">Защита на сесията ви в O\'Reilly на това устройство</string>
     <string name="ui_oreilly_sign_in_failed">Сесията ви в O\'Reilly не беше запазена. Опитайте да влезете отново.</string>
-    <string name="ui_open_in_riffle">Отваряне в Riffle</string>
+    <string name="ui_open_in_riffle">Отваряне в Riffle Foldable</string>
     <string name="ui_add_a_note">Добавяне на бележка…</string>
     <string name="ui_add_to_playlist">Добавяне към плейлиста</string>
     <string name="ui_all_books">Всички книги</string>

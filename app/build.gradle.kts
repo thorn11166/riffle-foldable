@@ -63,7 +63,7 @@ android {
     )
 
     defaultConfig {
-        applicationId = "com.riffle.app"
+        applicationId = "com.rifflefoldable.app"
         minSdk = 24
         targetSdk = 36
         versionCode = (findProperty("versionCode") as String?)?.toInt() ?: 1
