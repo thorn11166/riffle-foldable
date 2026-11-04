@@ -21,6 +21,12 @@ jobs:
           cache-read-only: 'false'
       - uses: ./.github/actions/setup-fonts
       - run: ./gradlew assembleDebug
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v7
+        with:
+          name: riffle-debug-apk
+          path: app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
 
   lint:
     name: Lint
