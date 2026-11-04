@@ -45,7 +45,7 @@ class ReaderSettingsSheetCapabilitiesTest {
         composeTestRule.onNodeWithText("Margins").assertIsDisplayed()
         composeTestRule.onNodeWithText("Display").performClick()
         composeTestRule.onNodeWithText("Reading mode").assertDoesNotExist()
-        composeTestRule.onNodeWithText("Double page in landscape").assertDoesNotExist()
+        composeTestRule.onNodeWithText("Double page spread").assertDoesNotExist()
         composeTestRule.onNodeWithText("Theme").assertDoesNotExist()
         composeTestRule.onNodeWithText("View").assertDoesNotExist()
         // supportsPositionOverlays gates all three EPUB-only overlay toggles as a group.
@@ -71,7 +71,7 @@ class ReaderSettingsSheetCapabilitiesTest {
         composeTestRule.onNodeWithText("Page").assertIsDisplayed()
         composeTestRule.onNodeWithText("Display").performClick()
         composeTestRule.onNodeWithText("Reading mode").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Double page in landscape").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Double page spread").assertIsDisplayed()
         composeTestRule.onNodeWithText("Theme").assertIsDisplayed()
         composeTestRule.onNodeWithText("Current chapter label").assertIsDisplayed()
         composeTestRule.onNodeWithText("Time remaining").assertIsDisplayed()

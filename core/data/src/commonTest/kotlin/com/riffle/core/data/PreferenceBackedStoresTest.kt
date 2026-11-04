@@ -8,6 +8,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 /** Fake [PreferenceStore] that stores a single in-memory value — platform-independent. */
 private class FakePreferenceStore<T>(initial: T) : PreferenceStore<T> {
@@ -36,6 +38,17 @@ class PreferenceBackedStoresTest {
         assertEquals(ReadingSpeedTracker.DEFAULT_SECS_PER_POSITION, store.speedSecPerPosition.first())
         store.updateSpeed(120.0)
         assertEquals(120.0, store.speedSecPerPosition.first())
+    }
+
+    @Test
+    fun `readerPromptPreferencesStore starts unshown and marks shown`() = runTest {
+        val store = readerPromptPreferencesStore(FakePreferenceStore(false))
+
+        assertFalse(store.doublePagePromptShown.first())
+
+        store.markDoublePagePromptShown()
+
+        assertTrue(store.doublePagePromptShown.first())
     }
 
     @Test

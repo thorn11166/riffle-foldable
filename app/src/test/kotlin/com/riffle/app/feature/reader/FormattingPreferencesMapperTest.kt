@@ -23,10 +23,32 @@ class FragmentConfigurationMapperTest {
 
     @Test
     fun doublePageInPortraitReflowablePinsSingleColumn() {
-        // Double-page only triggers two columns in landscape; portrait stays single-column.
+        // A narrow portrait window stays single-column; the wide-portrait test below covers foldables.
         val result = FormattingPreferences(doublePageSpread = true).toFragmentConfiguration(
             isLandscape = false,
             isFixedLayout = false,
+        )
+        assertEquals(ColCount.ONE, result.readiumCssRsProperties.colCount)
+    }
+
+    @Test
+    fun doublePageInWidePortraitReflowableSetsRsColCountTwo() {
+        // A foldable unfolded in portrait is wide even though the platform still reports portrait.
+        val result = FormattingPreferences(doublePageSpread = true).toFragmentConfiguration(
+            isLandscape = false,
+            isFixedLayout = false,
+            isDoublePageCapable = true,
+        )
+        assertEquals(ColCount.TWO, result.readiumCssRsProperties.colCount)
+        assertEquals("auto", result.readiumCssRsProperties.overrides["--RS__colWidth"])
+    }
+
+    @Test
+    fun doublePageCapableButSettingOffReflowablePinsSingleColumn() {
+        val result = FormattingPreferences(doublePageSpread = false).toFragmentConfiguration(
+            isLandscape = false,
+            isFixedLayout = false,
+            isDoublePageCapable = true,
         )
         assertEquals(ColCount.ONE, result.readiumCssRsProperties.colCount)
     }

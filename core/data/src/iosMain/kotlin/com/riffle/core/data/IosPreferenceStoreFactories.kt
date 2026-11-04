@@ -2,6 +2,7 @@ package com.riffle.core.data
 
 import com.riffle.core.domain.AppTheme
 import com.riffle.core.domain.AppThemeStore
+import com.riffle.core.domain.ReaderPromptPreferencesStore
 import com.riffle.core.domain.ReadingSpeedStore
 import com.riffle.core.domain.ReadingSpeedTracker
 import com.riffle.core.domain.WakeLockPreferencesStore
@@ -53,6 +54,19 @@ internal fun WakeLockPreferencesStore(): WakeLockPreferencesStore = wakeLockPref
     IosPreferenceStore(
         key = "keep_screen_on",
         defaultValue = true,
+        read = { defaults, key ->
+            if (defaults.objectForKey(key) != null) defaults.boolForKey(key) else null
+        },
+        write = { defaults, key, value -> defaults.setBool(value, forKey = key) },
+    ),
+)
+
+internal const val KEY_READER_DOUBLE_PAGE_PROMPT_SHOWN = "reader.double_page_prompt_shown"
+
+internal fun ReaderPromptPreferencesStore(): ReaderPromptPreferencesStore = readerPromptPreferencesStore(
+    IosPreferenceStore(
+        key = KEY_READER_DOUBLE_PAGE_PROMPT_SHOWN,
+        defaultValue = false,
         read = { defaults, key ->
             if (defaults.objectForKey(key) != null) defaults.boolForKey(key) else null
         },

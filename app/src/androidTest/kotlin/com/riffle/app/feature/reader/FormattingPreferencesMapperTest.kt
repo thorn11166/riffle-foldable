@@ -170,6 +170,17 @@ class FormattingPreferencesMapperTest {
     }
 
     @Test
+    fun doublePageInWidePortraitFixedLayoutProducesSpreadAlways() {
+        val result = FormattingPreferences(doublePageSpread = true).toEpubPreferences(
+            isLandscape = false,
+            isFixedLayout = true,
+            isDoublePageCapable = true,
+        )
+        assertEquals(Spread.ALWAYS, result.spread)
+        assertNull(result.columnCount)
+    }
+
+    @Test
     fun doublePageOffInLandscapeFixedLayoutProducesSpreadNever() {
         val result = FormattingPreferences(doublePageSpread = false).toEpubPreferences(
             isLandscape = true,

@@ -97,6 +97,7 @@ import com.riffle.core.domain.LibraryOrderPreferencesStore
 import com.riffle.core.domain.LibraryRefresher
 import com.riffle.core.domain.ListeningPreferencesStore
 import com.riffle.core.domain.ProgressReconciler
+import com.riffle.core.domain.ReaderPromptPreferencesStore
 import com.riffle.core.domain.ReadaloudPreferencesStore
 import com.riffle.core.domain.ReadaloudResumeStore
 import com.riffle.core.domain.ReadingPositionStore
@@ -309,6 +310,7 @@ val iosDataModule = module {
     single<AppThemeStore> { com.riffle.core.data.AppThemeStore() }
     single<ReadingSpeedStore> { com.riffle.core.data.ReadingSpeedStore() }
     single<WakeLockPreferencesStore> { com.riffle.core.data.WakeLockPreferencesStore() }
+    single<ReaderPromptPreferencesStore> { com.riffle.core.data.ReaderPromptPreferencesStore() }
     single<CoverGridDensityStore> { IosCoverGridDensityStoreImpl(get<CoverGridScaleDao>()) }
     single<LibraryFilterPreferencesStore> { IosLibraryFilterPreferencesStoreImpl() }
     single<LibraryOrderPreferencesStore> { IosLibraryOrderPreferencesStoreImpl() }
