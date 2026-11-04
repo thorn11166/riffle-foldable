@@ -5,7 +5,7 @@
   Every key here MUST also exist in values-es/ and values-bg/.
 -->
 <resources>
-    <string name="ui_app_name" translatable="false">Riffle</string>
+    <string name="ui_app_name" translatable="false">Riffle Foldable</string>
     <string name="ui_source_storyteller_name" translatable="false">Storyteller</string>
     <string name="ui_adds_the_toggle_to_the_reader_top_bar_all_orientations">Adds the toggle to the reader top bar (all orientations)</string>
     <string name="ui_adds_the_toggle_to_the_reader_top_bar_vertical_and_continuous_only">Adds the toggle to the reader top bar (Vertical &amp; Continuous only)</string>
@@ -90,7 +90,7 @@
     <string name="ui_display">Display</string>
     <string name="ui_display_summary">%1$s · %2$s · %3$s</string>
     <string name="ui_done">Done</string>
-    <string name="ui_double_page_in_landscape">Double page in landscape</string>
+    <string name="ui_double_page_spread">Double page spread</string>
     <string name="ui_download">Download</string>
     <string name="ui_download_only_audio_doesn_t_match">Download only · audio doesn't match</string>
     <string name="ui_download_only_no_audiobook_linked">Download only · no audiobook linked</string>

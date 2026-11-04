@@ -8,6 +8,7 @@ import com.riffle.core.domain.effectiveOrientation
 import com.riffle.feature.reader.ReadiumThemeName
 import com.riffle.feature.reader.readiumColumnCount
 import com.riffle.feature.reader.readiumFontFamilyName
+import com.riffle.feature.reader.shouldUseDoublePageSpread
 import com.riffle.feature.reader.toReadiumTextStyling
 import org.readium.r2.navigator.epub.EpubNavigatorFragment
 import org.readium.r2.navigator.epub.EpubPreferences
@@ -37,9 +38,14 @@ internal fun riffleDecorationTemplates(): HtmlDecorationTemplates =
 fun FormattingPreferences.toEpubPreferences(
     isLandscape: Boolean = false,
     isFixedLayout: Boolean = false,
+    isDoublePageCapable: Boolean = isLandscape,
 ): EpubPreferences {
     val effectiveOrientation = effectiveOrientation(isLandscape)
-    val isDoublePage = effectiveOrientation == ReaderOrientation.Horizontal && doublePageSpread && isLandscape
+    val isDoublePage = shouldUseDoublePageSpread(
+        requested = doublePageSpread,
+        isPaginated = effectiveOrientation == ReaderOrientation.Horizontal,
+        isDoublePageCapable = isDoublePageCapable,
+    )
     val styling = toReadiumTextStyling(
         isLandscape = isLandscape,
         isFixedLayout = isFixedLayout,
@@ -81,16 +87,18 @@ fun FormattingPreferences.toEpubPreferences(
 fun FormattingPreferences.toFragmentConfiguration(
     isLandscape: Boolean = false,
     isFixedLayout: Boolean = false,
+    isDoublePageCapable: Boolean = isLandscape,
 ): EpubNavigatorFragment.Configuration {
     // --RS__colCount is injected as an unconditional inline style on <html> at page-load
     // time, bypassing Readium's 60em media-query threshold that --USER__colCount relies on.
     // --RS__colWidth must be "auto" to remove the default 45em minimum which would otherwise
     // prevent two columns from fitting in a phone-width viewport.
     val effectiveOrientation = effectiveOrientation(isLandscape)
-    val isDoublePage = !isFixedLayout &&
-        effectiveOrientation == ReaderOrientation.Horizontal &&
-        doublePageSpread &&
-        isLandscape
+    val isDoublePage = !isFixedLayout && shouldUseDoublePageSpread(
+        requested = doublePageSpread,
+        isPaginated = effectiveOrientation == ReaderOrientation.Horizontal,
+        isDoublePageCapable = isDoublePageCapable,
+    )
     return EpubNavigatorFragment.Configuration(
         // Make our bundled font assets reachable to the WebView. Without this, the
         // @font-face src URLs registered in registerBundledFonts() 404 and the WebView
@@ -115,7 +123,7 @@ fun FormattingPreferences.toFragmentConfiguration(
             // the default across future engine upgrades. Readium 3.3.0, for example, changed the
             // default so a phone-width viewport rendered TWO columns — and its decoration renderer
             // mispositions the readaloud highlight in a multi-column layout, so the synced highlight
-            // silently vanished. (Landscape double-page still uses TWO columns above, by design.)
+            // silently vanished. (A wide-window double-page still uses TWO columns above, by design.)
             1 -> RsProperties(colCount = ColCount.ONE)
             // Scroll mode and fixed-layout: column count doesn't apply.
             else -> RsProperties()

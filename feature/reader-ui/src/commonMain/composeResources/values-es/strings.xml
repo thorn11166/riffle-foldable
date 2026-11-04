@@ -132,4 +132,9 @@
     <string name="ui_panel_failure_fell_back_to_full_page">Retrocedió a página completa</string>
     <string name="ui_panel_failure_cut_panel_cut_off">Panel recortado</string>
     <string name="ui_panel_failure_wrong_panel_order">Orden de paneles incorrecto</string>
+    <!-- Double-page first-run prompt -->
+    <string name="reader_double_page_prompt_title">¿Usar dos páginas?</string>
+    <string name="reader_double_page_prompt_body">Esta pantalla es lo bastante ancha para mostrar dos páginas una al lado de la otra. Puedes cambiarlo más tarde en Ajustes → Libros → Pantalla, o desde el panel de ajustes de lectura (Aa).</string>
+    <string name="reader_double_page_prompt_enable">Activar</string>
+    <string name="reader_double_page_prompt_not_now">Ahora no</string>
 </resources>

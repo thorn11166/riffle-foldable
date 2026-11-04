@@ -114,7 +114,9 @@ import com.riffle.feature.settings.ui.readersettings.swatchBackdropColor
 import com.riffle.app.ui.toScreenDimensionBucket
 import com.riffle.core.common.TimeRemaining
 import com.riffle.core.domain.FormattingPreferences
+import com.riffle.core.domain.FormattingPreferencesStore
 import com.riffle.core.domain.ReaderOrientation
+import com.riffle.core.domain.ReaderPromptPreferencesStore
 import com.riffle.core.domain.ReaderTheme
 import com.riffle.core.domain.SentenceQuote
 import com.riffle.core.domain.effectiveOrientation
@@ -127,8 +129,12 @@ import com.riffle.feature.reader.NarratedColumnProgression
 import com.riffle.feature.reader.RailSegment
 import com.riffle.feature.reader.VolumeNavEvent
 import com.riffle.feature.reader.chapterMapVisible
+import com.riffle.feature.reader.isDoublePageCapableWidth
+import com.riffle.feature.reader.shouldPromptForDoublePage
+import com.riffle.feature.reader.shouldUseDoublePageSpread
 import com.riffle.feature.reader.toCssRgba
 import com.riffle.feature.reader.ui.ChapterMapOverlay
+import com.riffle.feature.reader.ui.DoublePagePromptDialog
 import com.riffle.feature.reader.ui.NoteEditorSheet
 import com.riffle.feature.reader.ui.PullChip
 import com.riffle.feature.reader.ui.annotationSheetLabels
@@ -382,6 +388,13 @@ fun EpubReaderScreen(
 
     val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
     val effectiveOrientation = formattingPrefs.effectiveOrientation(isLandscape)
+    val isDoublePageCapable = isDoublePageCapableWidth(configuration.screenWidthDp.toFloat())
+    val readerPromptPreferencesStore: ReaderPromptPreferencesStore = koinInject()
+    val formattingPreferencesStore: FormattingPreferencesStore = koinInject()
+    val doublePagePromptShown by readerPromptPreferencesStore.doublePagePromptShown
+        .collectAsState(initial = true)
+    var doublePagePromptHandled by rememberSaveable { mutableStateOf(false) }
+    val promptScope = rememberCoroutineScope()
 
     // Reserve a fixed bottom strip for the readaloud mini-player only while the player is actually
     // open. Books whose match was never started render edge-to-edge with no wasted bottom space.
@@ -522,6 +535,7 @@ fun EpubReaderScreen(
                     EpubNavigatorView(
                         state = s,
                         formattingPrefs = formattingPrefs,
+                        isDoublePageCapable = isDoublePageCapable,
                         railSegments = railSegments,
                         spinePositions = spinePositions,
                         // Use formattingPreferences (= _formattingPreferences, set synchronously by
@@ -969,6 +983,35 @@ fun EpubReaderScreen(
                 onDismiss = { showFormattingPanel = false },
             )
         }
+        if (
+            state is ReaderState.Ready &&
+            formattingPreferencesReady &&
+            viewModel.readerSource != ReaderSource.Highlights &&
+            !showFormattingPanel &&
+            !doublePagePromptHandled &&
+            shouldPromptForDoublePage(
+                requested = pickedPrefs.doublePageSpread,
+                isPaginated = effectiveOrientation == ReaderOrientation.Horizontal,
+                isDoublePageCapable = isDoublePageCapable,
+                promptShown = doublePagePromptShown,
+            )
+        ) {
+            DoublePagePromptDialog(
+                onEnable = {
+                    doublePagePromptHandled = true
+                    viewModel.updateFormatting(pickedPrefs.copy(doublePageSpread = true))
+                    promptScope.launch {
+                        val global = formattingPreferencesStore.preferences.first()
+                        formattingPreferencesStore.update(global.copy(doublePageSpread = true))
+                        readerPromptPreferencesStore.markDoublePagePromptShown()
+                    }
+                },
+                onDismiss = {
+                    doublePagePromptHandled = true
+                    promptScope.launch { readerPromptPreferencesStore.markDoublePagePromptShown() }
+                },
+            )
+        }
         footnotePopup?.let { popupState ->
             val uriHandler = androidx.compose.ui.platform.LocalUriHandler.current
             com.riffle.feature.reader.ui.FootnotePopup(
@@ -1197,6 +1240,7 @@ internal fun annotationNavigationOptions(
 private fun EpubNavigatorView(
     state: ReaderState.Ready,
     formattingPrefs: FormattingPreferences,
+    isDoublePageCapable: Boolean,
     railSegments: List<RailSegment>,
     spinePositions: Pair<List<String>, List<Int>>,
     formattingPrefsProvider: () -> FormattingPreferences,
@@ -2559,8 +2603,12 @@ private fun EpubNavigatorView(
 
     // fragmentRef.value is a key so the effect re-fires when the fragment becomes available
     // after rotation (isLandscape changes while fragmentRef is null, so the call would be lost).
-    LaunchedEffect(formattingPrefs, isLandscape, fragmentRef.value, readiumPresenter) {
-        readiumPresenter?.updateLayoutContext(isLandscape = isLandscape, isFixedLayout = isFixedLayout)
+    LaunchedEffect(formattingPrefs, isLandscape, isDoublePageCapable, fragmentRef.value, readiumPresenter) {
+        readiumPresenter?.updateLayoutContext(
+            isLandscape = isLandscape,
+            isFixedLayout = isFixedLayout,
+            isDoublePageCapable = isDoublePageCapable,
+        )
         readiumPresenter?.applyTypography(formattingPrefs)
         coordinator.onPreferencesChanged(formattingPrefs)
     }
@@ -2674,7 +2722,11 @@ private fun EpubNavigatorView(
         minOf(composeDensity, dm.density.takeIf { it > 0f } ?: composeDensity)
     }
     val isPaginated = !isFixedLayout && effectiveOrientation == ReaderOrientation.Horizontal
-    val isDoublePage = isPaginated && formattingPrefs.doublePageSpread && isLandscape
+    val isDoublePage = shouldUseDoublePageSpread(
+        requested = formattingPrefs.doublePageSpread,
+        isPaginated = isPaginated,
+        isDoublePageCapable = isDoublePageCapable,
+    )
     // Both single-page and double-page paginated modes align the viewport to a whole-pixel width
     // so the CSS column-snap pitch (window.innerWidth) matches the physical pixel pitch exactly.
     // Without alignment, on non-integer-DPR devices the settle-snap fires a 1-2 CSS px correction
@@ -2859,8 +2911,16 @@ private fun EpubNavigatorView(
                             latest = latestLocator(),
                             initial = state.initialLocator,
                         ),
-                        initialPreferences = formattingPrefs.toEpubPreferences(isLandscape, isFixedLayout),
-                        configuration = formattingPrefs.toFragmentConfiguration(isLandscape, isFixedLayout).apply {
+                        initialPreferences = formattingPrefs.toEpubPreferences(
+                            isLandscape = isLandscape,
+                            isFixedLayout = isFixedLayout,
+                            isDoublePageCapable = isDoublePageCapable,
+                        ),
+                        configuration = formattingPrefs.toFragmentConfiguration(
+                            isLandscape = isLandscape,
+                            isFixedLayout = isFixedLayout,
+                            isDoublePageCapable = isDoublePageCapable,
+                        ).apply {
                             registerBundledFonts()
                             registerJavascriptInterface(FootnoteAnchorBridge.JS_NAME) { _ ->
                                 FootnoteAnchorBridge.bridge

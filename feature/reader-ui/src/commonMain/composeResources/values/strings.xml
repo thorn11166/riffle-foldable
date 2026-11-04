@@ -134,4 +134,9 @@
     <string name="ui_panel_failure_fell_back_to_full_page">Fell back to full page</string>
     <string name="ui_panel_failure_cut_panel_cut_off">Panel cut off</string>
     <string name="ui_panel_failure_wrong_panel_order">Wrong panel order</string>
+    <!-- Double-page first-run prompt -->
+    <string name="reader_double_page_prompt_title">Use two pages?</string>
+    <string name="reader_double_page_prompt_body">This screen is wide enough to show two pages side by side. You can change this later in Settings → Books → Display, or from the reading settings (Aa) panel.</string>
+    <string name="reader_double_page_prompt_enable">Turn on</string>
+    <string name="reader_double_page_prompt_not_now">Not now</string>
 </resources>

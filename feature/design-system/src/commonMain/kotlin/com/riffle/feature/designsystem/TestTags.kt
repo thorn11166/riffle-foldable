@@ -309,6 +309,11 @@ object TestTags {
     const val READER_SETTINGS_FORCE_PAGINATED_LANDSCAPE = "reader_settings_force_paginated_landscape"
     const val READER_SETTINGS_DOUBLE_PAGE = "reader_settings_double_page"
 
+    // First-run double-page prompt
+    const val READER_DOUBLE_PAGE_PROMPT = "reader_double_page_prompt"
+    const val READER_DOUBLE_PAGE_PROMPT_ENABLE = "reader_double_page_prompt_enable"
+    const val READER_DOUBLE_PAGE_PROMPT_NOT_NOW = "reader_double_page_prompt_not_now"
+
     // Behavior section
     const val READER_SETTINGS_KEEP_SCREEN_ON = "reader_settings_keep_screen_on"
     const val READER_SETTINGS_VOLUME_KEY_NAV = "reader_settings_volume_key_nav"

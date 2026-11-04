@@ -96,6 +96,7 @@ tasks.withType<Test>().configureEach {
         excludeTestsMatching("com.riffle.feature.reader.ui.AnnotationsPanelTest")
         excludeTestsMatching("com.riffle.feature.reader.ui.FootnotePopupTest")
         excludeTestsMatching("com.riffle.feature.reader.ui.ReturnToPositionCardTest")
+        excludeTestsMatching("com.riffle.feature.reader.ui.DoublePagePromptDialogTest")
         // CbzPanelViewer: same constraint — runs on iOS sim; Android renders the panel view
         // on-device in `app/src/androidTest` (`CbzThumbnailStripTest` harness area).
         excludeTestsMatching("com.riffle.feature.reader.ui.CbzPanelViewerTest")

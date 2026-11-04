@@ -14,6 +14,7 @@ import com.riffle.core.domain.HighlightColorPreferencesStore
 import com.riffle.core.domain.HighlightsResumeStore
 import com.riffle.core.domain.ReadaloudPreferences
 import com.riffle.core.domain.ReadaloudPreferencesStore
+import com.riffle.core.domain.ReaderPromptPreferencesStore
 import com.riffle.core.domain.ReadingSpeedStore
 import com.riffle.core.domain.ReadingSpeedTracker
 import com.riffle.core.domain.WakeLockPreferencesStore
@@ -50,6 +51,11 @@ fun ReadingSpeedStore(dataStore: DataStore<Preferences>): ReadingSpeedStore = re
 
 fun WakeLockPreferencesStore(dataStore: DataStore<Preferences>): WakeLockPreferencesStore =
     wakeLockPreferencesStore(preferenceStore(dataStore, PrefCodecs.boolean("keep_screen_on", default = true)))
+
+fun ReaderPromptPreferencesStore(dataStore: DataStore<Preferences>): ReaderPromptPreferencesStore =
+    readerPromptPreferencesStore(
+        preferenceStore(dataStore, PrefCodecs.boolean("reader_double_page_prompt_shown", default = false)),
+    )
 
 fun ReadaloudPreferencesStore(dataStore: DataStore<Preferences>): ReadaloudPreferencesStore {
     // Legacy "PINK" / "PURPLE" values written by older builds fall through to BLUE via the

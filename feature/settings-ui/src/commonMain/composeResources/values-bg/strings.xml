@@ -87,7 +87,7 @@
     <string name="ui_display">Дисплей</string>
     <string name="ui_display_summary">%1$s · %2$s · %3$s</string>
     <string name="ui_done">Готово</string>
-    <string name="ui_double_page_in_landscape">Двойна страница в пейзаж</string>
+    <string name="ui_double_page_spread">Двойна страница</string>
     <string name="ui_download">Изтегляне</string>
     <string name="ui_download_only_audio_doesn_t_match">Само изтегляне · аудиото не съвпада</string>
     <string name="ui_download_only_no_audiobook_linked">Само изтегляне · няма свързана аудиокнига</string>

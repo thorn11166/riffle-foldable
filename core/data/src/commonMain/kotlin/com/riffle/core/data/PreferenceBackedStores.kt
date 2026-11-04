@@ -2,6 +2,7 @@ package com.riffle.core.data
 
 import com.riffle.core.domain.AppTheme
 import com.riffle.core.domain.AppThemeStore
+import com.riffle.core.domain.ReaderPromptPreferencesStore
 import com.riffle.core.domain.ReadingSpeedStore
 import com.riffle.core.domain.WakeLockPreferencesStore
 import kotlinx.coroutines.flow.Flow
@@ -30,4 +31,10 @@ internal fun wakeLockPreferencesStore(prefs: PreferenceStore<Boolean>): WakeLock
     object : WakeLockPreferencesStore {
         override val keepScreenOn: Flow<Boolean> = prefs.flow
         override suspend fun setKeepScreenOn(value: Boolean) = prefs.update(value)
+    }
+
+internal fun readerPromptPreferencesStore(prefs: PreferenceStore<Boolean>): ReaderPromptPreferencesStore =
+    object : ReaderPromptPreferencesStore {
+        override val doublePagePromptShown: Flow<Boolean> = prefs.flow
+        override suspend fun markDoublePagePromptShown() = prefs.update(true)
     }

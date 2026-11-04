@@ -63,6 +63,7 @@ import com.riffle.core.domain.HighlightsResumeStore
 import com.riffle.core.domain.ListeningPreferencesStore
 import com.riffle.core.domain.ReadaloudLinkRepository
 import com.riffle.core.domain.ReaderOrientation
+import com.riffle.core.domain.ReaderPromptPreferencesStore
 import com.riffle.core.domain.ReadingPositionStore
 import com.riffle.core.domain.ReadingSessionCoordinator
 import com.riffle.core.domain.ReadingSessionRepository
@@ -148,8 +149,11 @@ import com.riffle.feature.reader.highlights.mimeForHref
 import com.riffle.feature.reader.highlights.parseAnnotationTapUrl
 import com.riffle.feature.reader.highlights.shouldShowOpenInBook
 import com.riffle.feature.reader.highlights.shouldShowShareHighlights
+import com.riffle.feature.reader.isDoublePageCapableWidth
 import com.riffle.feature.reader.readiumFontFamilyName
 import com.riffle.feature.reader.resolveAnnotationSheetColor
+import com.riffle.feature.reader.shouldPromptForDoublePage
+import com.riffle.feature.reader.shouldUseDoublePageSpread
 import com.riffle.feature.reader.spineIndexOfHref
 import com.riffle.feature.reader.toCssRgba
 import com.riffle.feature.reader.toReadiumTextStyling
@@ -159,6 +163,7 @@ import com.riffle.feature.reader.ui.AutoScrollToggleIcon
 import com.riffle.feature.reader.ui.CadenceHudPill
 import com.riffle.feature.reader.ui.CadenceToggleIcon
 import com.riffle.feature.reader.ui.ChapterMapOverlay
+import com.riffle.feature.reader.ui.DoublePagePromptDialog
 import com.riffle.feature.reader.ui.FigureZoomOverlay
 import com.riffle.feature.reader.ui.FootnotePopup
 import com.riffle.feature.reader.ui.NoteEditorSheet
@@ -247,6 +252,11 @@ fun EpubReaderScreen(
     // Landscape flag — derived from the Compose container so it updates on rotation.
     val containerSize = LocalWindowInfo.current.containerSize
     val isLandscape = containerSize.width > containerSize.height
+    val isDoublePageCapable = isDoublePageCapableWidth(containerSize.width.toFloat())
+    val readerPromptPreferencesStore = koinInject<ReaderPromptPreferencesStore>()
+    val doublePagePromptShown by readerPromptPreferencesStore.doublePagePromptShown
+        .collectAsState(initial = true)
+    var doublePagePromptHandled by remember { mutableStateOf(false) }
     // Rotation-invariant screen-size key for per-book formatting overrides (ADR 0031).
     val screenDimensionBucket = remember(containerSize) {
         ScreenDimensionBucket.of(
@@ -566,7 +576,7 @@ fun EpubReaderScreen(
     // theme, the Auto schedule and the live system-dark flag, and re-emits at each day/night
     // crossing so a book left open across the threshold repaints. `readerTheme` is already
     // concrete, so `toReadiumThemeName` never sees Auto here.
-    LaunchedEffect(item.id, isLandscape) {
+    LaunchedEffect(item.id, isLandscape, isDoublePageCapable) {
         combine(
             formattingPreferencesStore.preferences,
             appearanceCoordinator.resolved,
@@ -580,9 +590,11 @@ fun EpubReaderScreen(
                 storedPrefs = stored
                 resolvedPrefs = effective
                 orientationRef.value = effectiveOrient
-                val isDoublePage = effective.doublePageSpread &&
-                    effectiveOrient == ReaderOrientation.Horizontal &&
-                    isLandscape
+                val isDoublePage = shouldUseDoublePageSpread(
+                    requested = effective.doublePageSpread,
+                    isPaginated = effectiveOrient == ReaderOrientation.Horizontal,
+                    isDoublePageCapable = isDoublePageCapable,
+                )
                 val styling = effective.toReadiumTextStyling(isLandscape = isLandscape, isDoublePage = isDoublePage)
                 navigator.applyReaderPreferences(
                     fontSizePercent = effective.fontSize,
@@ -2241,6 +2253,47 @@ fun EpubReaderScreen(
             positionFlow = navigator.positionFlow,
             modifier = Modifier.align(Alignment.BottomCenter),
         )
+
+        val promptPrefs = resolvedPrefs
+        if (
+            promptPrefs != null &&
+            source != ReaderSource.Highlights &&
+            !settingsOpen &&
+            !doublePagePromptHandled &&
+            shouldPromptForDoublePage(
+                requested = promptPrefs.doublePageSpread,
+                isPaginated = promptPrefs.effectiveOrientation(isLandscape) == ReaderOrientation.Horizontal,
+                isDoublePageCapable = isDoublePageCapable,
+                promptShown = doublePagePromptShown,
+            )
+        ) {
+            DoublePagePromptDialog(
+                onEnable = {
+                    doublePagePromptHandled = true
+                    val updated = promptPrefs.copy(doublePageSpread = true)
+                    val updatedOverrides = bookOverrides.withChanges(promptPrefs, updated)
+                    bookOverrides = updatedOverrides
+                    scope.launch {
+                        bookFormattingPreferencesStore.save(
+                            item.sourceId,
+                            item.id,
+                            screenDimensionBucket,
+                            updatedOverrides,
+                        )
+                    }
+                    storedPrefs?.let { stored ->
+                        scope.launch {
+                            formattingPreferencesStore.update(stored.copy(doublePageSpread = true))
+                        }
+                    }
+                    scope.launch { readerPromptPreferencesStore.markDoublePagePromptShown() }
+                },
+                onDismiss = {
+                    doublePagePromptHandled = true
+                    scope.launch { readerPromptPreferencesStore.markDoublePagePromptShown() }
+                },
+            )
+        }
 
         // Reader settings sheet ("Aa" button).
         if (settingsOpen) {

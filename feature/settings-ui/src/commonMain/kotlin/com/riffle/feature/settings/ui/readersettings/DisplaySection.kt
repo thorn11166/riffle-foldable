@@ -138,8 +138,7 @@ fun DisplaySection(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth().alpha(if (doublePageEnabled) 1f else 0.38f),
             ) {
-                // TODO: migrate to Res.string.ui_double_page_in_landscape
-                Text(stringResource(Res.string.ui_double_page_in_landscape), style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
+                Text(stringResource(Res.string.ui_double_page_spread), style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
                 Switch(
                     checked = prefs.doublePageSpread,
                     onCheckedChange = { onPrefsChange(prefs.copy(doublePageSpread = it)) },

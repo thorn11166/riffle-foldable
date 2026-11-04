@@ -346,6 +346,7 @@ private const val DS_COMIC_FORMATTING = "comicFormattingPreferencesDataStore"
 private const val DS_DEVELOPER_OPTIONS = "developerOptionsDataStore"
 private const val DS_PANEL_VIEW = "panelViewPreferencesDataStore"
 private const val DS_AUDIOBOOK_SLEEP_STOP = "audiobookSleepStopDataStore"
+private const val DS_READER_PROMPT = "readerPromptPreferencesDataStore"
 
 private const val DEFAULT_HTTP_CACHE_BYTES: Long = 20L * 1024L * 1024L
 private const val WEB_SOURCE_CACHE_BYTES: Long = 10L * 1024L * 1024L
@@ -551,6 +552,7 @@ private val coreDataPreferencesModule = module {
     single(named(DS_APP_UPDATE)) { androidContext().appUpdatePreferencesDataStore }
     single(named(DS_COMIC_FORMATTING)) { androidContext().comicFormattingPreferencesDataStore }
     single(named(DS_AUDIOBOOK_SLEEP_STOP)) { androidContext().audiobookSleepStopDataStore }
+    single(named(DS_READER_PROMPT)) { androidContext().readerPromptPreferencesDataStore }
 
     // Preference store implementations — concrete registration first where needed as dependency
     single { FormattingPreferencesStoreImpl(get(named(DS_FORMATTING))) }
@@ -605,6 +607,9 @@ private val coreDataPreferencesModule = module {
     }
     single<AppUpdatePreferencesStore> {
         com.riffle.core.data.AppUpdatePreferencesStore(get(named(DS_APP_UPDATE)))
+    }
+    single<com.riffle.core.domain.ReaderPromptPreferencesStore> {
+        com.riffle.core.data.ReaderPromptPreferencesStore(get(named(DS_READER_PROMPT)))
     }
     single<ContentCacheSettingsStore> {
         com.riffle.core.data.ContentCacheSettingsStore(get(named(DS_CONTENT_CACHE_SETTINGS)))

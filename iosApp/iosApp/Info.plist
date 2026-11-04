@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Riffle</string>
+	<string>Riffle Foldable</string>
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">Riffle</string>
+    <string name="app_name" translatable="false">Riffle Foldable</string>
     <string name="export_pdf_error">Couldn\'t generate PDF</string>
     <string name="reader_book_not_found">Book not found</string>
     <string name="source_storyteller_name" translatable="false">Storyteller</string>
@@ -107,7 +107,7 @@
     <string name="ui_downloading_dictionary">Downloading dictionary…</string>
     <string name="ui_download_failed_retry">Download failed. Check your connection and try again.</string>
     <string name="ui_pages_of_read">%1$d of %2$d pages read</string>
-    <string name="ui_open_in_riffle">Open in Riffle</string>
+    <string name="ui_open_in_riffle">Open in Riffle Foldable</string>
     <string name="ui_add_a_note">Add a note…</string>
     <string name="ui_add_to_playlist">Add to playlist</string>
     <string name="ui_all_books">All Books</string>

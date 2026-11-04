@@ -69,11 +69,17 @@ internal class ReadiumPresenter(
      */
     @Volatile private var isLandscape: Boolean = false
     @Volatile private var isFixedLayout: Boolean = false
+    @Volatile private var isDoublePageCapable: Boolean = false
 
     /** Push the current device/EPUB layout into the presenter before [applyTypography] runs. */
-    fun updateLayoutContext(isLandscape: Boolean, isFixedLayout: Boolean) {
+    fun updateLayoutContext(
+        isLandscape: Boolean,
+        isFixedLayout: Boolean,
+        isDoublePageCapable: Boolean,
+    ) {
         this.isLandscape = isLandscape
         this.isFixedLayout = isFixedLayout
+        this.isDoublePageCapable = isDoublePageCapable
     }
 
     /**
@@ -185,7 +191,13 @@ internal class ReadiumPresenter(
 
     override suspend fun applyTypography(prefs: FormattingPreferences) {
         val fragment = fragment ?: return
-        fragment.submitPreferences(prefs.toEpubPreferences(isLandscape, isFixedLayout))
+        fragment.submitPreferences(
+            prefs.toEpubPreferences(
+                isLandscape = isLandscape,
+                isFixedLayout = isFixedLayout,
+                isDoublePageCapable = isDoublePageCapable,
+            ),
+        )
         // The injected CSS overrides (font family, custom margins) are also re-applied on each
         // onPageLoaded by the bridge's TypographyOverride capability; doing it here too means a
         // live preferences change takes effect immediately without waiting for the next page turn.
